@@ -1,0 +1,33 @@
+# Virtual environment folder
+venv/
+.venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VSCode settings folder
+.vscode/
+
+# Environment variables
+.env
+
+# Test & coverage
+.pytest_cache/
+.tox/
+.coverage
+coverage.xml
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
