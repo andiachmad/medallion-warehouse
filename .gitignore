@@ -31,3 +31,27 @@ coverage.xml
 build/
 dist/
 *.egg-info/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Data folders
+data/raw/
+data/processed/
+
+# Data file extensions (opsional, untuk jaga-jaga)
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.pkl
+*.h5
+*.db
+
+# Jupyter runtime and history
+.jupyter/
+.history
+
+# Config file
+config.yaml
