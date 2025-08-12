@@ -40,7 +40,7 @@ Thumbs.db
 data/raw/
 data/processed/
 
-# Data file extensions (opsional, untuk jaga-jaga)
+# Data file extensions
 *.csv
 *.tsv
 *.parquet
@@ -48,6 +48,12 @@ data/processed/
 *.pkl
 *.h5
 *.db
+*.sqlite
+*.sqlite3
+*.xls
+*.xlsx
+*.xlsm
+*.ods
 
 # Jupyter runtime and history
 .jupyter/
