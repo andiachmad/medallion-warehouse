@@ -73,3 +73,80 @@ models:
         description: "The most frequent review title for the product (mode of review titles)."
         tests:
           - not_null
+  
+  - name: gold_order_status_tracking
+    description: "Gold layer model for tracking order status, delivery performance, and order values"
+
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        tests:
+          - not_null
+          - unique
+      
+      - name: order_status
+        description: "Current order status (delivered, shipped, processing, etc.)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['delivered', 'invoiced', 'shipped', 'processing', 'unavailable', 'canceled', 'created', 'approved']
+              quote: true
+
+      - name: delivery_delay_days
+        description: "Original delivery delay (may contain outliers)"
+
+      - name: delivery_delay_days_cleaned
+        description: "Delivery delay cleaned according to business rules"
+      
+      - name: is_outlier_delivery_delay
+        description: "Flag 1 if delivery_delay_days is outlier, 0 otherwise"
+
+      - name: days_to_approve
+        description: "Original days to approve"
+
+      - name: days_to_approve_cleaned
+        description: "Days to approve cleaned according to business rules"
+
+      - name: is_outlier_days_to_approve
+        description: "Flag 1 if days_to_approve is outlier, 0 otherwise"
+
+      - name: total_order_value
+        description: "Total order value (price + freight_value)"
+
+      - name: load_timestamp
+        description: "Timestamp when the record was inserted into gold layer"
+
+    tests:
+      # Unique order_id
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [order_id]
+
+      # Non-delivered/shipped should not have delivery_delay_days_cleaned
+      - dbt_utils.expression_is_true:
+          expression: "NOT (order_status NOT IN ('delivered', 'shipped') AND delivery_delay_days_cleaned IS NOT NULL)"
+          config:
+            severity: error
+
+      # Only delivered/shipped can have delivery_delay_days_cleaned (outlier allowed as NULL)
+      - dbt_utils.expression_is_true:
+          expression: "NOT (order_status IN ('delivered', 'shipped') AND delivery_delay_days IS NULL AND is_outlier_delivery_delay = 0)"
+          config:
+            severity: warn
+
+      # Orders in 'created' shouldn't have days_to_approve_cleaned > 30 (exclude outlier)
+      - dbt_utils.expression_is_true:
+          expression: "NOT (order_status = 'created' AND days_to_approve_cleaned > 30)"
+          config:
+            severity: warn
+
+      # Canceled/unavailable shouldn't have days_to_approve_cleaned > 60 (exclude outlier)
+      - dbt_utils.expression_is_true:
+          expression: "NOT (order_status IN ('canceled', 'unavailable') AND days_to_approve_cleaned > 60)"
+          config:
+            severity: warn
+
+      # Total order value must always > 0
+      - dbt_utils.expression_is_true:
+          expression: "COALESCE(total_order_value,0) > 0"
+          config:
+            severity: error
