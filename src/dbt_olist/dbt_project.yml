@@ -21,7 +21,9 @@ models:
     silver:
       +materialized: table
     gold:
-      +materialized: table
+      facts:
+        +schema: gold
+        +materialized: table
     example:    # subfolder di dalam models/
       +materialized: view  # semua model di sini default jadi view
 
